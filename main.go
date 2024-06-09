@@ -59,6 +59,8 @@ func initRoutes(log *slog.Logger, db *sqlx.DB) http.Handler {
 
 		case "/auth":
 			handler.Login(log, db).ServeHTTP(w, r)
+		case "/refresh":
+			handler.RefreshToken().ServeHTTP(w, r)
 		default:
 			w.WriteHeader(http.StatusNotFound)
 			w.Write([]byte("Not Found"))

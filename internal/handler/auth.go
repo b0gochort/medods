@@ -60,9 +60,9 @@ func Login(log *slog.Logger, db *sqlx.DB) http.HandlerFunc {
 	}
 }
 
-func RefreshToken(w http.ResponseWriter, r *http.Request) http.HandlerFunc {
+func RefreshToken() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		secretKey := viper.GetString("jwt.secret_key")
+		secretKey := []byte(viper.GetString("jwt.secret"))
 
 		userIP := r.Header.Get("X-Forwarded-For")
 
@@ -77,16 +77,6 @@ func RefreshToken(w http.ResponseWriter, r *http.Request) http.HandlerFunc {
 
 		claims := model.JwtCustomClaims{}
 
-		if claims.IP != userIP {
-			if err := sendMail(claims.Email); err != nil {
-				w.WriteHeader(http.StatusUnauthorized)
-				slog.Info("refresh token send mail error", err)
-				return
-			}
-
-			return
-		}
-
 		token, err := jwt2.ParseWithClaims(refreshToken,
 			&claims,
 			func(token *jwt2.Token) (interface{}, error) {
@@ -96,6 +86,16 @@ func RefreshToken(w http.ResponseWriter, r *http.Request) http.HandlerFunc {
 		if err != nil || !token.Valid {
 			w.WriteHeader(http.StatusUnauthorized)
 			slog.Info("refresh token parse error", err)
+			return
+		}
+
+		if claims.IP != userIP {
+			if err := sendMail(claims.Email); err != nil {
+				w.WriteHeader(http.StatusUnauthorized)
+				slog.Info("refresh token send mail error", err)
+				return
+			}
+
 			return
 		}
 
@@ -129,26 +129,26 @@ func RefreshToken(w http.ResponseWriter, r *http.Request) http.HandlerFunc {
 }
 
 func sendMail(email string) error {
-	// Sender data.
 	from := viper.GetString("email.from")
-	password := viper.GetString("email.password")
+	password := viper.GetString("email.pass")
 
-	// Receiver email address.
-	to := []string{
-		email,
+	if from == "" {
+		return fmt.Errorf("send email: sender email is not provided")
 	}
 
-	// smtp server configuration.
+	to := []string{email}
+
+	if email == "" {
+		return fmt.Errorf("send email: recipient email is not provided")
+	}
+
 	smtpHost := viper.GetString("email.host")
 	smtpPort := viper.GetString("email.port")
 
-	// Message.
-	message := []byte("This is a test email message.")
+	message := []byte(fmt.Sprintf("From: %s\r\nTo: %s\r\nSubject: WARNING\r\n\r\nWARNING!!", from, email))
 
-	// Authentication.
 	auth := smtp.PlainAuth("", from, password, smtpHost)
 
-	// Sending email.
 	err := smtp.SendMail(smtpHost+":"+smtpPort, auth, from, to, message)
 	if err != nil {
 		return fmt.Errorf("send email: %w", err)

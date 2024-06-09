@@ -8,7 +8,7 @@ import (
 )
 
 func GenerateToken(ip, email string, expiration time.Duration) (string, error) {
-	secretKey := viper.GetString("jwt.secret")
+	secretKey := []byte(viper.GetString("jwt.secret"))
 	claims := &model.JwtCustomClaims{
 		IP:    ip,
 		Email: email,
