@@ -67,6 +67,9 @@ func initRoutes(log *slog.Logger, db *sqlx.DB) http.Handler {
 			handler.PingHandler(log, db).ServeHTTP(w, r)
 		case "/helloworld":
 			handler.HelloWorld(w, r)
+
+		case "/auth":
+			handler.Login(log, db).ServeHTTP(w, r)
 		default:
 			w.WriteHeader(http.StatusNotFound)
 			w.Write([]byte("Not Found"))
