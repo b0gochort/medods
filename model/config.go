@@ -4,6 +4,7 @@ type Config struct {
 	HTTP     Http     `json:"http"`
 	Postgres Postgres `json:"postgres"`
 	JWT      JWT      `json:"jwt"`
+	Email    Email    `json:"email"`
 }
 
 type Http struct {
@@ -18,6 +19,14 @@ type Postgres struct {
 	Database  string `json:"database"`
 	SSL       string `json:"ssl"`
 	Migration string `json:"migration"`
+}
+
+type Email struct {
+	From string `json:"from"`
+	To   string `json:"to"`
+	Pass string `json:"pass"`
+	Host string `json:"host"`
+	Port string `json:"port"`
 }
 
 type JWT struct {

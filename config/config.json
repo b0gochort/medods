@@ -1,19 +1,27 @@
 {
   "http": {
-    "port": ":8080"
+    "port" : ":8080"
   },
 
   "postgres": {
-    "host": "localhost",
-    "port": "5432",
-    "database": "medods",
-    "user": "postgres",
-    "password": "qwerty",
-    "ssl": "disable",
-    "migration": "./db/migrations"
+    "host" : "localhost",
+    "port" : "5432",
+    "database" : "medods",
+    "user" : "postgres",
+    "password" : "qwerty",
+    "ssl" : "disable",
+    "migration" : "./db/migrations"
   },
 
   "jwt": {
-    "secret": "secret"
+    "secret" : "secret"
+  },
+
+  "email": {
+    "from" : "no-reply@decide-career.com",
+    "to" : "stels6555@gmail.com",
+    "pass" : "eLnp1caZpJJnZLpe8cTi",
+    "host" : "smtp.mail.ru",
+    "port" : "587"
   }
 }
