@@ -1,0 +1,15 @@
+{
+  "http": {
+    "port": ":8080"
+  },
+
+  "postgres": {
+    "host": "localhost",
+    "port": "5432",
+    "database": "medods",
+    "user": "postgres",
+    "password": "qwerty",
+    "ssl_mode": "disable",
+    "migrations_path": "./db/migrations"
+  }
+}
