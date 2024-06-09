@@ -9,7 +9,11 @@
     "database": "medods",
     "user": "postgres",
     "password": "qwerty",
-    "ssl_mode": "disable",
-    "migrations_path": "./db/migrations"
+    "ssl": "disable",
+    "migration": "./db/migrations"
+  },
+
+  "jwt": {
+    "secret": "secret"
   }
 }

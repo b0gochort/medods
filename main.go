@@ -1,8 +1,9 @@
 package main
 
 import (
-	"encoding/json"
+	"fmt"
 	"github.com/jmoiron/sqlx"
+	"github.com/spf13/viper"
 	"medods/internal/handler"
 	"medods/internal/repository/postgres"
 	"medods/model"
@@ -11,36 +12,44 @@ import (
 	"log/slog"
 
 	"net/http"
-	"os"
 )
 
-var config model.Config
+var Config model.Config
+
+func getConf() *model.Config {
+	viper.SetConfigFile("config/config.json")
+	err := viper.ReadInConfig()
+
+	if err != nil {
+		fmt.Printf("%v", err)
+	}
+
+	conf := &model.Config{}
+	err = viper.Unmarshal(conf)
+	if err != nil {
+		fmt.Printf("unable to decode into config struct, %v", err)
+	}
+
+	return conf
+}
 
 func main() {
 	log := logging.InitLog()
 
-	configData, err := os.ReadFile("config/config.json")
-	if err != nil {
-		log.Error("could not read config file", "err", err)
-		return
-	}
-	if err = json.Unmarshal(configData, &config); err != nil {
-		log.Error("unmarshal config", "err", err)
-		return
-	}
+	Config = *getConf()
 
-	db, err := postgres.New(config)
+	db, err := postgres.New(Config)
 	if err != nil {
 		log.Error("could not connect to db", "err", err)
 		return
 	}
 
 	server := &http.Server{
-		Addr:    config.HTTP.Port,
+		Addr:    Config.HTTP.Port,
 		Handler: initRoutes(log, db),
 	}
 
-	log.Info("starting server on port", "port", config.HTTP.Port)
+	log.Info("starting server on port", "port", Config.HTTP.Port)
 	if err := server.ListenAndServe(); err != nil {
 		log.Error("failed to start server", "err", err)
 	}
@@ -55,7 +64,7 @@ func initRoutes(log *slog.Logger, db *sqlx.DB) http.Handler {
 
 		switch r.URL.Path {
 		case "/ping":
-			handler.Ping(w, r)
+			handler.PingHandler(log, db).ServeHTTP(w, r)
 		case "/helloworld":
 			handler.HelloWorld(w, r)
 		default:
