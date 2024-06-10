@@ -9,4 +9,5 @@ RUN CGO_ENABLED=0 go build -ldflags "-X main.version=`git describe --tags --abbr
 FROM alpine:latest
 WORKDIR /
 COPY --from=BuildStage /app/medods medods
+COPY --from=BuildStage /app/config /config
 ENTRYPOINT ["./medods"]
