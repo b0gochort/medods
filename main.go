@@ -93,7 +93,7 @@ func migrateDB(db *sqlx.DB, log *slog.Logger) {
 		log.Error("Couldn't get database instance for running migrations: ", err)
 	}
 
-	m, err := migrate.NewWithDatabaseInstance("file://C:/Users/bogochort/study/medods/db/migrations", "medods", driver)
+	m, err := migrate.NewWithDatabaseInstance("file://db/migrations", "medods", driver)
 	if err != nil {
 		log.Error("Couldn't create migrate instance: ", err)
 		return
